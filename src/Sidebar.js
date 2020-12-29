@@ -7,7 +7,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {SearchOutlined} from '@material-ui/icons/';
 import SidebarChat from './SidebarChat';
 
-function Sidebar() {
+function Sidebar(props) {
+
     return (
         <div className="sidebar">
             <div className="sidebar__header">
@@ -34,9 +35,8 @@ function Sidebar() {
             </div>
 
             <div className="sidebar__chats">
-                <SidebarChat />
-                <SidebarChat />
-                <SidebarChat />
+                <SidebarChat setIsChatOpen={props.setIsChatOpen} setRoom={props.setRoom} nomeRoom="nome1" />
+                <SidebarChat setIsChatOpen={props.setIsChatOpen} setRoom={props.setRoom} nomeRoom="nome2" />
             </div>
 
 

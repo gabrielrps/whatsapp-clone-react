@@ -1,22 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
-import Chat from './Chat';
-
 import './App.css';
-
+import Chat from './Chat';
 
 function App() {
 
-  return (
-    <div className="app">
+  const [room, setRoom] = useState();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-      <div className="app__body">      
-        
-        <Sidebar />
-        <Chat />
-      
-      </div>      
-    </div>
+  return (
+
+      <div className="app">
+
+        <div className="app__body">      
+          
+          <Sidebar setIsChatOpen={setIsChatOpen} setRoom={setRoom} />
+
+          {isChatOpen && (<Chat key={room} nameRoom={room} />)}
+          
+        </div>      
+      </div>
   );
 
 }

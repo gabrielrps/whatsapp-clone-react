@@ -15,7 +15,6 @@ function SidebarChat(props) {
 
             <div className="sidebarChat__info" onClick={handleClickRoom}>
                 <h2>Romm name</h2>
-                <p>This is the last message</p>
             </div>
             
         </div>

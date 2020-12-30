@@ -5,6 +5,7 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import MicIcon from '@material-ui/icons/Mic';
 import axios from './axios';
 import SockJsClient from 'react-stomp';
+import Dropzone from 'react-dropzone'
 
 import "./Chat.css";
 
@@ -25,6 +26,7 @@ function Chat(props) {
             name: props.login,
             timestamp: new Date().toDateString(),
             received: false,
+            upload: false
         }));  
         
       
@@ -33,6 +35,7 @@ function Chat(props) {
             name: props.login,
             timestamp: new Date().toDateString(),
             received: false,
+            upload: false
         });
       
         setInput("");
@@ -60,6 +63,32 @@ function Chat(props) {
         setInput(value);
     }
 
+    async function onDrop(acceptedFiles) {
+        var file = "";
+
+        acceptedFiles.forEach(fileRet => {
+            file = fileRet;
+        });
+
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const response = await axios.post(`/api/upload/${props.login}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+
+        setMessages([...messages, response.data]);
+
+    }
+
+    function handleImage(file){
+        if (file){
+            return "data:image/png;base64,"+file.data;       
+        }
+    }
+
     return (
         <div className="chat">
 
@@ -83,7 +112,17 @@ function Chat(props) {
                         <SearchOutlined />
                     </IconButton>
                     <IconButton>
-                       <AttachFile /> 
+                       
+                       <Dropzone className="chat__headerRight__dropzone" accept="image/*" onDrop={(acceptedFiles) => onDrop(acceptedFiles)}>
+                            {({getRootProps, getInputProps}) => (
+                                <section>
+                                    <div {...getRootProps()}>
+                                        <input {...getInputProps()} />
+                                        <AttachFile />
+                                    </div>
+                                </section>
+                            )}
+                        </Dropzone> 
                     </IconButton>
                     <IconButton>
                         <MoreVert />
@@ -95,7 +134,10 @@ function Chat(props) {
                 {messages.map((message, index) => (
                     <p key={index} className={`chat__message ${message.name === props.login && 'chat__receiver'}`}>
                         <span className="chat__name">{message.name}</span>
-                        {message.message}
+                        {!message.upload && (message.message)}
+                        {message.upload && (
+                            <span><img src={handleImage(message.file)} className="img__message" alt="" /></span>  
+                        )}
                         <span className="chat__timestamp">{message.timestamp}</span>
                     </p>
                 ))}  

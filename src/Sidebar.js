@@ -36,7 +36,6 @@ function Sidebar(props) {
 
             <div className="sidebar__chats">
                 <SidebarChat setIsChatOpen={props.setIsChatOpen} setRoom={props.setRoom} nomeRoom="nome1" />
-                <SidebarChat setIsChatOpen={props.setIsChatOpen} setRoom={props.setRoom} nomeRoom="nome2" />
             </div>
 
 

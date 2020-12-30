@@ -90,3 +90,14 @@
     padding: 10px;
     color: gray;
 }
+
+.chat__headerRight__dropzone {
+    outline-width: 0;
+}
+
+.img__message {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}

@@ -2,10 +2,10 @@ import React, {useState, useRef, useEffect} from 'react';
 import { Avatar, IconButton } from '@material-ui/core';
 import {SearchOutlined, AttachFile, MoreVert,} from '@material-ui/icons/';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
-import MicIcon from '@material-ui/icons/Mic';
 import axios from './axios';
 import SockJsClient from 'react-stomp';
-import Dropzone from 'react-dropzone'
+import Dropzone from 'react-dropzone';
+import MicRecorder from 'mic-recorder-to-mp3';
 
 import "./Chat.css";
 
@@ -15,8 +15,12 @@ function Chat(props) {
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const [isRecording, setIsRecording] = useState(false);
     const clientRef = useRef();
     const chatLog = useRef(null);
+    const [blobURL, setBlobURL] = useState("");
+    
+    const [Mp3Recorder, setMp3Recorder] = useState({});
 
     const sendMessage = (e) => {
         e.preventDefault();
@@ -47,6 +51,8 @@ function Chat(props) {
           .then(response => {
             setMessages(response.data);
           });
+
+          setMp3Recorder(new MicRecorder({ bitRate: 128 }));
     },[]);  
 
     useEffect(() => {
@@ -87,6 +93,37 @@ function Chat(props) {
         if (file){
             return "data:image/png;base64,"+file.data;       
         }
+    }
+
+    function handleSound(file){
+        if (file){
+            return "data:audio/mp3;base64,"+file.data;       
+        }
+    }
+
+    function start(){
+        Mp3Recorder.start().then(() => {
+            setIsRecording(true);
+        }).catch((e) => console.error(e));
+    }
+
+    async function stop(){
+        await Mp3Recorder.stop().getMp3().then(([buffer, blob]) => {
+            
+
+            const formData = new FormData();
+            formData.append("file", blob);
+            
+            axios.post(`/api/uploadSound/${props.login}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then(response => {
+                setIsRecording(false);
+                setMessages([...messages, response.data]);
+            });
+
+        }).catch((e) => console.log(e));
     }
 
     return (
@@ -134,9 +171,12 @@ function Chat(props) {
                 {messages.map((message, index) => (
                     <p key={index} className={`chat__message ${message.name === props.login && 'chat__receiver'}`}>
                         <span className="chat__name">{message.name}</span>
-                        {!message.upload && (message.message)}
-                        {message.upload && (
+                        {!message.upload && !message.sound && (message.message)}
+                        {message.upload && !message.sound && (
                             <span><img src={handleImage(message.file)} className="img__message" alt="" /></span>  
+                        )}
+                        {!message.upload && message.sound && (
+                            <span><audio src={handleSound(message.file)} controls="controls" /></span>  
                         )}
                         <span className="chat__timestamp">{message.timestamp}</span>
                     </p>
@@ -149,9 +189,18 @@ function Chat(props) {
                 <form>
                     <input value={input} onChange={handleInput} placeholder="Type a message" type="text" />
                     <button onClick={sendMessage} type="submit">Send a message</button>
-                </form>  
+                </form>
+                
+                <button onClick={start} disabled={isRecording}>
+                    Record
+                </button>
 
-                <MicIcon />  
+                <button onClick={stop} disabled={!isRecording}>
+                    Stop
+                </button>
+
+                
+              
            </div>
 
         </div>

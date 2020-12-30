@@ -22,7 +22,7 @@ function Chat(props) {
 
         clientRef.current.sendMessage('/app/send', JSON.stringify({
             message: input,
-            name: "Demo Name",
+            name: props.login,
             timestamp: new Date().toDateString(),
             received: false,
         }));  
@@ -30,7 +30,7 @@ function Chat(props) {
       
         axios.post("/api/messages/new", {
             message: input,
-            name: "Demo Name",
+            name: props.login,
             timestamp: new Date().toDateString(),
             received: false,
         });
@@ -93,7 +93,7 @@ function Chat(props) {
 
            <div className="chat__body" ref={chatLog}>
                 {messages.map((message, index) => (
-                    <p key={index} className={`chat__message ${message.received && 'chat__receiver'}`}>
+                    <p key={index} className={`chat__message ${message.name === props.login && 'chat__receiver'}`}>
                         <span className="chat__name">{message.name}</span>
                         {message.message}
                         <span className="chat__timestamp">{message.timestamp}</span>

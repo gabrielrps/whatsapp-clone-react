@@ -18,7 +18,6 @@ function Chat(props) {
     const [isRecording, setIsRecording] = useState(false);
     const clientRef = useRef();
     const chatLog = useRef(null);
-    const [blobURL, setBlobURL] = useState("");
     
     const [Mp3Recorder, setMp3Recorder] = useState({});
 
@@ -86,7 +85,7 @@ function Chat(props) {
         });
 
         setMessages([...messages, response.data]);
-
+        
     }
 
     function handleImage(file){

@@ -10,10 +10,10 @@ function SidebarChat(props) {
     }
 
     return (
-        <div className="sidebarChat">
+        <div className="sidebarChat" onClick={handleClickRoom}>
             <Avatar src="" />
 
-            <div className="sidebarChat__info" onClick={handleClickRoom}>
+            <div className="sidebarChat__info">
                 <h2>Romm name</h2>
             </div>
             

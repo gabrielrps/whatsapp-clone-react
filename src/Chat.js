@@ -78,24 +78,37 @@ function Chat(props) {
         const formData = new FormData();
         formData.append("file", file);
         
-        const response = await axios.post(`/api/upload/${props.login}`, formData, {
+        await axios.post(`/api/upload/${props.login}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             }
         });
 
-        setMessages([...messages, response.data]);
-        
+        clientRef.current.sendMessage('/app/send', JSON.stringify({
+            message: input,
+            name: props.login,
+            timestamp: new Date().toDateString(),
+            received: false,
+            upload: true,
+            sound: false,
+            file: window.URL.createObjectURL(file)
+        }));
     }
 
-    function handleImage(file){
-        if (file){
+    function handleImage(file) {
+        if (file) {
+            if (typeof (file) === 'string') { 
+                return file;
+            }
             return "data:image/png;base64,"+file.data;       
         }
     }
 
     function handleSound(file){
-        if (file){
+        if (file) {
+            if (typeof (file) === 'string') { 
+                return file;
+            }
             return "data:audio/mp3;base64,"+file.data;       
         }
     }
@@ -119,8 +132,18 @@ function Chat(props) {
                 }
             }).then(response => {
                 setIsRecording(false);
-                setMessages([...messages, response.data]);
             });
+
+
+             clientRef.current.sendMessage('/app/send', JSON.stringify({
+                message: input,
+                name: props.login,
+                timestamp: new Date().toDateString(),
+                received: false,
+                upload: false,
+                sound: true,
+                file: window.URL.createObjectURL(blob)
+            }));
 
         }).catch((e) => console.log(e));
     }
